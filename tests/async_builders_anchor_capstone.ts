@@ -46,7 +46,7 @@ describe("inQrio — On-Chain Program", () => {
   });
 
   // ════════════════════════════════════════════════════════════════════════
-  //  PART 1 — LEARNING & ASSESSMENT
+  //  PART 1 — LEARNING AND ASSESSMENT
   // ════════════════════════════════════════════════════════════════════════
 
   describe("Learning & Assessment", () => {
