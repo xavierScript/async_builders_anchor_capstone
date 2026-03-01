@@ -1,4 +1,4 @@
-# Async Builders Anchor Capstone — inQrio
+# Async Builders Anchor Capstone — inQrio (DevNet: DE4Q3C4boDBeMobfbaSxETX9EmW4984HbZP9rKfDbMPQ)
 
 This repository is the capstone project for the Async Builders program at the Solana Turbine Institute. It contains an Anchor-based Solana program, TypeScript client bindings, on-chain program IDL, tests, and deployment runbooks.
 
@@ -73,3 +73,16 @@ surfpool start
 # In this repo
 anchor test --skip-local-validator
 ```
+
+## Recent Deployment (example)
+
+The program was recently deployed; key deployment details are recorded here for convenience.
+
+- **Deploying cluster:** https://api.devnet.solana.com
+- **Program name:** async_builders_anchor_capstone
+- **Program Id:** DE4Q3C4boDBeMobfbaSxETX9EmW4984HbZP9rKfDbMPQ
+- **Signature:** 4ftfnSmvQ94oygg6RuEgzB3o9n1fMLqv2tyt5gU59EE7YWMnLDG9x3qnKkY5Xn8c8RENGZHVw8dtgsWVpEFx39Rx
+- **IDL account created:** 3hQdBhSj6ArmRr3JNZVgaiFdokWqynF8hz6xSinA1uyJ
+- **IDL data length:** 1858 bytes
+
+You can reference the deployed program id in `Anchor.toml`
