@@ -28,7 +28,7 @@ pub struct EvaluateTopicCompletion<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + TopicCompletion::INIT_SPACE,
+        space = TopicCompletion::DISCRIMINATOR.len() + TopicCompletion::INIT_SPACE,
         seeds = [b"topic", user.key().as_ref(), topic_id.to_le_bytes().as_ref()],
         bump,
     )]

@@ -18,7 +18,7 @@ pub struct InitializeSubjectProgress<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + SubjectProgress::INIT_SPACE,
+        space = SubjectProgress::DISCRIMINATOR.len() + SubjectProgress::INIT_SPACE,
         seeds = [b"subject", user.key().as_ref(), subject_id.to_le_bytes().as_ref()],
         bump,
     )]

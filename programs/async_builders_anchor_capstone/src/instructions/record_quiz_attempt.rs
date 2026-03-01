@@ -28,7 +28,7 @@ pub struct RecordQuizAttempt<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + QuizAttempt::INIT_SPACE,
+        space = QuizAttempt::DISCRIMINATOR.len() + QuizAttempt::INIT_SPACE,
         seeds = [b"quiz", user.key().as_ref(), quiz_id.to_le_bytes().as_ref()],
         bump,
     )]

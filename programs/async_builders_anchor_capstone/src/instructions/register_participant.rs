@@ -20,7 +20,7 @@ pub struct RegisterParticipant<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + TournamentParticipant::INIT_SPACE,
+        space = TournamentParticipant::DISCRIMINATOR.len() + TournamentParticipant::INIT_SPACE,
         seeds = [b"tournament_participant", user.key().as_ref(), tournament_id.to_le_bytes().as_ref()],
         bump,
     )]

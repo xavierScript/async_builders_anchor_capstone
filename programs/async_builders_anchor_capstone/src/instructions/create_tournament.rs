@@ -12,7 +12,7 @@ pub struct CreateTournament<'info> {
     #[account(
         init,
         payer = admin,
-        space = 8 + Tournament::INIT_SPACE,
+        space = Tournament::DISCRIMINATOR.len() + Tournament::INIT_SPACE,
         seeds = [b"tournament", tournament_id.to_le_bytes().as_ref()],
         bump,
     )]

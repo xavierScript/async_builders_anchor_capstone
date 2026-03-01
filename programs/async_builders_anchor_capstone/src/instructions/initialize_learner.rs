@@ -10,7 +10,7 @@ pub struct InitializeLearner<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + LearnerProfile::INIT_SPACE,
+        space = LearnerProfile::DISCRIMINATOR.len() + LearnerProfile::INIT_SPACE,
         seeds = [b"learner", user.key().as_ref()],
         bump,
     )]
