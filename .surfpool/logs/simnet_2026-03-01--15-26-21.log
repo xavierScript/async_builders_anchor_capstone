@@ -1,0 +1,14 @@
+[2026-03-01--15-26-21 INFO actix_server::builder] starting 5 workers
+[2026-03-01--15-26-21 INFO actix_server::server] Tokio runtime found; starting in existing Tokio runtime
+[2026-03-01--15-26-21 INFO actix_server::server] starting service: "actix-web-service-127.0.0.1:18488", workers: 5, listening on: 127.0.0.1:18488
+[2026-03-01--15-26-22 INFO parity_ws] Listening for new connections on 127.0.0.1:8900.
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] [Recovery Instructions] - An ephemeral authority account will be created and funded to write to the buffer account.
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] [Recovery Instructions] - Please save the following information in case the deployment fails and the account needs to be recovered:
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] [Recovery Instructions] - Ephemeral authority public key: F6Ns7TB2UCaGrvXkPBE2XgDFKcsEWmxVHZieRJJHZECD
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] [Recovery Instructions] - Ephemeral authority secret key: [213, 14, 216, 189, 93, 214, 161, 14, 160, 202, 1, 222, 61, 207, 117, 165, 133, 14, 33, 61, 58, 111, 141, 127, 89, 237, 123, 12, 131, 148, 22, 3, 209, 100, 62, 33, 198, 178, 67, 160, 55, 223, 10, 61, 232, 177, 67, 160, 29, 219, 15, 115, 38, 69, 114, 20, 56, 101, 70, 85, 74, 17, 72, 62]
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] Account Created - Ephemeral authority account created and funded to write to buffer
+[2026-03-01--15-27-14 INFO txtx::svm::deploy_program] [Recovery Instructions] - Creating program buffer account at pubkey BRsMkyrQ9Runo6iKeDQdFmttXDqF5LpsBmYDinnZNpe5
+[2026-03-01--15-27-15 INFO txtx::svm::deploy_program] Account Created - Program buffer account created
+[2026-03-01--15-27-24 INFO txtx::svm::deploy_program] Buffer Ready - Writing to buffer account is complete
+[2026-03-01--15-27-45 INFO txtx::svm::deploy_program] Program Created - Program DE4Q3C4boDBeMobfbaSxETX9EmW4984HbZP9rKfDbMPQ has been deployed
+[2026-03-01--15-27-46 INFO txtx::svm::deploy_program] Complete - Ephemeral authority account closed and leftover funds returned to payer

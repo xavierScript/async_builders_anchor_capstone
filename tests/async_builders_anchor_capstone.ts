@@ -29,20 +29,25 @@ describe("inQrio — On-Chain Program", () => {
   }
 
   // ──────────────────────────────────────────────────────────────────────
-  // Setup: airdrop SOL to secondary wallets
+  // Setup: fund secondary wallets via transfer from provider wallet
+  // (avoids devnet airdrop rate limits / 429 errors)
   // ──────────────────────────────────────────────────────────────────────
   before(async () => {
-    const sig1 = await provider.connection.requestAirdrop(
-      adminKeypair.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL,
+    const transferTx = new anchor.web3.Transaction().add(
+      anchor.web3.SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: adminKeypair.publicKey,
+        lamports: 2 * anchor.web3.LAMPORTS_PER_SOL,
+      }),
+      anchor.web3.SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: participant2.publicKey,
+        lamports: 2 * anchor.web3.LAMPORTS_PER_SOL,
+      }),
     );
-    await provider.connection.confirmTransaction(sig1);
 
-    const sig2 = await provider.connection.requestAirdrop(
-      participant2.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL,
-    );
-    await provider.connection.confirmTransaction(sig2);
+    const sig = await provider.sendAndConfirm(transferTx);
+    console.log("Funded secondary wallets via transfer:", sig);
   });
 
   // ════════════════════════════════════════════════════════════════════════
