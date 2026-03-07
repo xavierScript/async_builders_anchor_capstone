@@ -14,6 +14,10 @@ describe("inQrio — On-Chain Program", () => {
   const user = provider.wallet as anchor.Wallet;
   const adminKeypair = Keypair.generate();
   const participant2 = Keypair.generate();
+  const learnerKeypair = Keypair.generate();
+
+  // Unique per-run seed so devnet accounts never collide across test runs
+  const RUN_ID = Math.floor(Date.now() / 1000);
 
   // ──────────────────────────────────────────────────────────────────────
   // Helper: derive PDA
@@ -44,6 +48,11 @@ describe("inQrio — On-Chain Program", () => {
         toPubkey: participant2.publicKey,
         lamports: 2 * anchor.web3.LAMPORTS_PER_SOL,
       }),
+      anchor.web3.SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: learnerKeypair.publicKey,
+        lamports: 2 * anchor.web3.LAMPORTS_PER_SOL,
+      }),
     );
 
     const sig = await provider.sendAndConfirm(transferTx);
@@ -55,10 +64,10 @@ describe("inQrio — On-Chain Program", () => {
   // ════════════════════════════════════════════════════════════════════════
 
   describe("Learning & Assessment", () => {
-    const subjectId = 1;
-    const topicId = 101;
-    const quizId1 = 1001;
-    const quizId2 = 1002;
+    const subjectId = RUN_ID;
+    const topicId = RUN_ID + 100;
+    const quizId1 = RUN_ID + 200;
+    const quizId2 = RUN_ID + 201;
 
     let learnerProfilePda: PublicKey;
     let subjectProgressPda: PublicKey;
@@ -66,22 +75,25 @@ describe("inQrio — On-Chain Program", () => {
     it("initializes a learner profile", async () => {
       [learnerProfilePda] = findPda([
         Buffer.from("learner"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
       ]);
 
       await program.methods
         .initializeLearner()
         .accountsPartial({
-          user: user.publicKey,
+          user: learnerKeypair.publicKey,
           learnerProfile: learnerProfilePda,
           systemProgram: SystemProgram.programId,
         })
+        .signers([learnerKeypair])
         .rpc();
 
       const profile = await program.account.learnerProfile.fetch(
         learnerProfilePda,
       );
-      expect(profile.user.toBase58()).to.equal(user.publicKey.toBase58());
+      expect(profile.user.toBase58()).to.equal(
+        learnerKeypair.publicKey.toBase58(),
+      );
       expect(profile.totalTopicsCompleted).to.equal(0);
       expect(profile.totalQuizzesAttempted).to.equal(0);
       expect(profile.createdAtTimestamp.toNumber()).to.be.greaterThan(0);
@@ -90,24 +102,27 @@ describe("inQrio — On-Chain Program", () => {
     it("initializes subject progress", async () => {
       [subjectProgressPda] = findPda([
         Buffer.from("subject"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(subjectId),
       ]);
 
       await program.methods
         .initializeSubjectProgress(subjectId)
         .accountsPartial({
-          user: user.publicKey,
+          user: learnerKeypair.publicKey,
           learnerProfile: learnerProfilePda,
           subjectProgress: subjectProgressPda,
           systemProgram: SystemProgram.programId,
         })
+        .signers([learnerKeypair])
         .rpc();
 
       const progress = await program.account.subjectProgress.fetch(
         subjectProgressPda,
       );
-      expect(progress.user.toBase58()).to.equal(user.publicKey.toBase58());
+      expect(progress.user.toBase58()).to.equal(
+        learnerKeypair.publicKey.toBase58(),
+      );
       expect(progress.subjectId).to.equal(subjectId);
       expect(progress.topicsCompleted).to.equal(0);
       expect(progress.quizzesCompleted).to.equal(0);
@@ -116,19 +131,20 @@ describe("inQrio — On-Chain Program", () => {
     it("records a quiz attempt (passing score — 75)", async () => {
       const [quizAttemptPda] = findPda([
         Buffer.from("quiz"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(quizId1),
       ]);
 
       await program.methods
         .recordQuizAttempt(subjectId, topicId, quizId1, 75, 120)
         .accountsPartial({
-          user: user.publicKey,
+          user: learnerKeypair.publicKey,
           learnerProfile: learnerProfilePda,
           subjectProgress: subjectProgressPda,
           quizAttempt: quizAttemptPda,
           systemProgram: SystemProgram.programId,
         })
+        .signers([learnerKeypair])
         .rpc();
 
       const attempt = await program.account.quizAttempt.fetch(quizAttemptPda);
@@ -150,19 +166,20 @@ describe("inQrio — On-Chain Program", () => {
     it("records a quiz attempt (outstanding score — 95)", async () => {
       const [quizAttemptPda] = findPda([
         Buffer.from("quiz"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(quizId2),
       ]);
 
       await program.methods
         .recordQuizAttempt(subjectId, topicId, quizId2, 95, 90)
         .accountsPartial({
-          user: user.publicKey,
+          user: learnerKeypair.publicKey,
           learnerProfile: learnerProfilePda,
           subjectProgress: subjectProgressPda,
           quizAttempt: quizAttemptPda,
           systemProgram: SystemProgram.programId,
         })
+        .signers([learnerKeypair])
         .rpc();
 
       const attempt = await program.account.quizAttempt.fetch(quizAttemptPda);
@@ -178,19 +195,20 @@ describe("inQrio — On-Chain Program", () => {
     it("evaluates topic completion", async () => {
       const [topicCompletionPda] = findPda([
         Buffer.from("topic"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(topicId),
       ]);
 
       await program.methods
         .evaluateTopicCompletion(subjectId, topicId, 2) // Strong mastery
         .accountsPartial({
-          user: user.publicKey,
+          user: learnerKeypair.publicKey,
           learnerProfile: learnerProfilePda,
           subjectProgress: subjectProgressPda,
           topicCompletion: topicCompletionPda,
           systemProgram: SystemProgram.programId,
         })
+        .signers([learnerKeypair])
         .rpc();
 
       const completion = await program.account.topicCompletion.fetch(
@@ -215,7 +233,7 @@ describe("inQrio — On-Chain Program", () => {
     it("prevents duplicate topic completion (same PDA fails to init)", async () => {
       const [topicCompletionPda] = findPda([
         Buffer.from("topic"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(topicId),
       ]);
 
@@ -223,12 +241,13 @@ describe("inQrio — On-Chain Program", () => {
         await program.methods
           .evaluateTopicCompletion(subjectId, topicId, 1)
           .accountsPartial({
-            user: user.publicKey,
+            user: learnerKeypair.publicKey,
             learnerProfile: learnerProfilePda,
             subjectProgress: subjectProgressPda,
             topicCompletion: topicCompletionPda,
             systemProgram: SystemProgram.programId,
           })
+          .signers([learnerKeypair])
           .rpc();
         expect.fail("Should have thrown — duplicate topic completion");
       } catch (err: any) {
@@ -238,10 +257,10 @@ describe("inQrio — On-Chain Program", () => {
     });
 
     it("rejects invalid score (> 100)", async () => {
-      const badQuizId = 9999;
+      const badQuizId = RUN_ID + 999;
       const [quizAttemptPda] = findPda([
         Buffer.from("quiz"),
-        user.publicKey.toBuffer(),
+        learnerKeypair.publicKey.toBuffer(),
         u32ToLeBytes(badQuizId),
       ]);
 
@@ -249,12 +268,13 @@ describe("inQrio — On-Chain Program", () => {
         await program.methods
           .recordQuizAttempt(subjectId, topicId, badQuizId, 150, 60)
           .accountsPartial({
-            user: user.publicKey,
+            user: learnerKeypair.publicKey,
             learnerProfile: learnerProfilePda,
             subjectProgress: subjectProgressPda,
             quizAttempt: quizAttemptPda,
             systemProgram: SystemProgram.programId,
           })
+          .signers([learnerKeypair])
           .rpc();
         expect.fail("Should have thrown — invalid score");
       } catch (err: any) {
@@ -268,7 +288,7 @@ describe("inQrio — On-Chain Program", () => {
   // ════════════════════════════════════════════════════════════════════════
 
   describe("Tournament Management", () => {
-    const tournamentId = 1;
+    const tournamentId = RUN_ID + 500;
     const subjectId = 1;
     const now = Math.floor(Date.now() / 1000);
     const startTime = now + 60;
